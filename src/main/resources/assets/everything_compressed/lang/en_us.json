@@ -1,0 +1,5 @@
+{
+    "item.everything_compressed.singularity.single": "%s Singularity",
+    "item.everything_compressed.singularity.multiple": "%sx %s Singularity",
+    "item.everything_compressed.singularity.tooltip.density": "Density: %s"
+}
