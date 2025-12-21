@@ -13,16 +13,5 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = EverythingCompressed.MOD_ID)
 public class CommonForgeEventHandler {
-    @SubscribeEvent
-    public static void onCommandRegister(RegisterCommandsEvent event) {
-        event.getDispatcher().register(
-                Commands.literal("testttttt").executes((ctx) -> {
-                    ctx.getSource().getPlayer().addItem(SingularityItem.fromCompressionInfo(new CompressionInfo(new ItemStack(Items.DIAMOND))));
-                    ctx.getSource().getPlayer().addItem(SingularityItem.fromCompressionInfo(new CompressionInfo(new ItemStack(Items.DIAMOND), Long.MAX_VALUE)));
-                    ctx.getSource().getPlayer().addItem(SingularityItem.fromCompressionInfo(new CompressionInfo(new ItemStack(Items.DIAMOND), Integer.MAX_VALUE)));
-                    ctx.getSource().sendSuccess(() -> Component.literal("succeed"), false);
-                    return 0;
-                })
-        );
-    }
+
 }
