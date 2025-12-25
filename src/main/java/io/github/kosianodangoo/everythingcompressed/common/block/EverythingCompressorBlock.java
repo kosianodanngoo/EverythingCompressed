@@ -42,6 +42,17 @@ public class EverythingCompressorBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if (pState.getBlock() != pNewState.getBlock()){
+            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+            if(blockEntity instanceof EverythingCompressorBlockEntity everythingCompressorBlockEntity){
+                everythingCompressorBlockEntity.dropInventory();
+            }
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
+
+    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction direction = context.getHorizontalDirection().getOpposite();
         return this.defaultBlockState().setValue(FACING, direction);

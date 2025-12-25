@@ -5,7 +5,11 @@ import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTy
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -67,6 +71,10 @@ public class EverythingCompressorBlockEntity extends BlockEntity {
         if (progress <= 0 && !isLocked() && outputHandler.getStackInSlot(0).isEmpty()) {
             setCompressedStack(ItemStack.EMPTY);
         }
+    }
+
+    public void dropInventory() {
+        Containers.dropContents(this.level, this.getBlockPos(), NonNullList.of(this.combinedInv.getStackInSlot(0)));
     }
 
     public void processCompressing() {
