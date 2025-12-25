@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlocks;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModItems;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
+import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -17,7 +18,7 @@ public class EverythingCompressed {
 
     public static final String MOD_ID = "everything_compressed";
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public EverythingCompressed() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -25,6 +26,7 @@ public class EverythingCompressed {
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlockEntityTypes.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 

@@ -1,18 +1,25 @@
 package io.github.kosianodangoo.everythingcompressed.common.item;
 
+import io.github.kosianodangoo.everythingcompressed.client.renderer.SingularityItemRenderer;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.capability.CompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.capability.CompressionInfoProvider;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModCapabilities;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModItems;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class SingularityItem extends Item {
     public SingularityItem(Properties p_41383_) {
@@ -84,5 +91,16 @@ public class SingularityItem extends Item {
         return Component.translatable("item.everything_compressed.singularity.multiple", compressionTime, sourceStack.getHoverName());
     }
 
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private SingularityItemRenderer renderer;
 
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return this.renderer == null ? this.renderer = new SingularityItemRenderer(SingularityItem.this) : this.renderer;
+            }
+        });
+    }
 }

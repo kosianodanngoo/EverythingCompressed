@@ -3,13 +3,20 @@ package io.github.kosianodangoo.everythingcompressed.common.block.entity;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
+import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,11 +34,13 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class EverythingCompressorBlockEntity extends BlockEntity {
+public class EverythingCompressorBlockEntity extends BlockEntity implements MenuProvider {
     public static final String PROGRESS_NBT = "progress";
     public static final String COMPRESSED_STACK_NBT = "compressed_stack";
     public static final String OUTPUT_NBT = "output";
     public static final String LOCKED_NBT = "locked";
+
+    public final ContainerData data;
 
     private static ForgeConfigSpec.LongValue SINGULARITY_DENSITY = EverythingCompressedConfig.SINGULARITY_DENSITY;
 
@@ -59,6 +68,23 @@ public class EverythingCompressorBlockEntity extends BlockEntity {
 
     public EverythingCompressorBlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
         super(p_155228_, p_155229_, p_155230_);
+        this.data = new ContainerData() {
+            @Override
+            public int get(int i) {
+                return switch (i) {
+                    case 0 -> (int) (progress & (long) Integer.MAX_VALUE);
+                    case 1 -> (int) (progress >> 32 & (long) Integer.MAX_VALUE);
+                    default -> 0;
+                };
+            }
+            @Override
+            public void set(int i, int i1) {
+            }
+            @Override
+            public int getCount() {
+                return 2;
+            }
+        };
     }
 
 
@@ -108,6 +134,10 @@ public class EverythingCompressorBlockEntity extends BlockEntity {
         return progress;
     }
 
+    public IItemHandlerModifiable getInventory() {
+        return this.combinedInv;
+    }
+
     public void addStack(ItemStack stack, long count) {
         if (!isValidStack(stack)) {
             return;
@@ -154,6 +184,16 @@ public class EverythingCompressorBlockEntity extends BlockEntity {
         this.setCompressedStack(ItemStack.of(compoundTag.getCompound(COMPRESSED_STACK_NBT)));
         this.internalOutputHandler.deserializeNBT(compoundTag.getCompound(OUTPUT_NBT));
         this.setLocked(compoundTag.getBoolean(LOCKED_NBT));
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return this.getBlockState().getBlock().getName();
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return new EverythingCompressorMenu(i, inventory, this, this.data);
     }
 
     public class CompressorItemInputHandler implements IItemHandlerModifiable {
