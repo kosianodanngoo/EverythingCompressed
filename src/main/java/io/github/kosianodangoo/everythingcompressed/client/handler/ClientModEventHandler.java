@@ -17,10 +17,4 @@ public class ClientModEventHandler {
     public static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> MenuScreens.register(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), EverythingCompressorScreen::new));
     }
-
-    @SubscribeEvent
-    public static void registerModels(ModelEvent.RegisterAdditional event) {
-        EverythingCompressed.LOGGER.debug("register models");
-        event.register(SingularityItem.modelLocation);
-    }
 }

@@ -29,8 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 public class SingularityItem extends Item {
-    public static ResourceLocation modelLocation = null;
-
     public SingularityItem(Properties p_41383_) {
         super(p_41383_);
     }
@@ -99,10 +97,8 @@ public class SingularityItem extends Item {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        if (modelLocation == null)
-            modelLocation = new ModelResourceLocation(ResourceLocationUtil.getResourceLocation("custom/singularity"), "inventory");
         consumer.accept(new IClientItemExtensions() {
-            private final SingularityItemRenderer renderer = new SingularityItemRenderer(modelLocation);
+            private final SingularityItemRenderer renderer = new SingularityItemRenderer();
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
