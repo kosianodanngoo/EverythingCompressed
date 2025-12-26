@@ -2,5 +2,8 @@
     "item.everything_compressed.singularity.single": "%s Singularity",
     "item.everything_compressed.singularity.multiple": "%sx %s Singularity",
     "item.everything_compressed.singularity.tooltip.density": "Density: %s",
-    "block.everything_compressed.everything_compressor": "Everything Compressor"
+    "block.everything_compressed.everything_compressor": "Everything Compressor",
+
+    "gui.everything_compressed.everything_compressor.progress": "Progress: %s",
+    "gui.everything_compressed.everything_compressor.required": "Required: %s"
 }

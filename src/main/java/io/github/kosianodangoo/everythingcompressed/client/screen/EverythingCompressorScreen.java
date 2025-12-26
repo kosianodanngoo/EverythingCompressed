@@ -3,7 +3,12 @@ package io.github.kosianodangoo.everythingcompressed.client.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
+import io.github.kosianodangoo.everythingcompressed.utils.ResourceLocationUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.font.FontManager;
+import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -12,11 +17,10 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class EverythingCompressorScreen extends AbstractContainerScreen<EverythingCompressorMenu> {
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(EverythingCompressed.MOD_ID,"textures/gui/everything_compressor.png");
+            ResourceLocationUtil.getResourceLocation("textures/gui/everything_compressor.png");
 
     public EverythingCompressorScreen(EverythingCompressorMenu p_97741_, Inventory p_97742_, Component p_97743_) {
         super(p_97741_, p_97742_, p_97743_);
-        EverythingCompressed.LOGGER.debug("create screen instance");
         this.imageWidth = 176;
         this.imageHeight = 166;
         this.inventoryLabelY = 70;
@@ -29,6 +33,11 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
         RenderSystem.setShaderTexture(0,TEXTURE);
         int x = (width - this.imageWidth) / 2;
         int y = (height - this.imageHeight) / 2;
+        long required = menu.getRequired();
+        if(required > 0)
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.required", required), imageWidth/2 + x, 20 + y, 4210752);
+
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.progress", menu.getProgress()), imageWidth/2 + x, 30 + y, 4210752);
 
         guiGraphics.blit(TEXTURE,x,y,0,0, 256, 256, 256, 256);
     }

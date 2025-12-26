@@ -3,8 +3,10 @@ package io.github.kosianodangoo.everythingcompressed.client.handler;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
 import io.github.kosianodangoo.everythingcompressed.client.screen.EverythingCompressorScreen;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
+import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -12,7 +14,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = EverythingCompressed.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientModEventHandler {
     @SubscribeEvent
-    public static void clientSetup(FMLClientSetupEvent evt) {
-        evt.enqueueWork(() -> MenuScreens.register(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), EverythingCompressorScreen::new));
+    public static void clientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> MenuScreens.register(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), EverythingCompressorScreen::new));
+    }
+
+    @SubscribeEvent
+    public static void registerModels(ModelEvent.RegisterAdditional event) {
+        EverythingCompressed.LOGGER.debug("register models");
+        event.register(SingularityItem.modelLocation);
     }
 }

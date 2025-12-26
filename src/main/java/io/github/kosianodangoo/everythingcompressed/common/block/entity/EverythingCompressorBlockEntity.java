@@ -72,8 +72,10 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             @Override
             public int get(int i) {
                 return switch (i) {
-                    case 0 -> (int) (progress & (long) Integer.MAX_VALUE);
-                    case 1 -> (int) (progress >> 32 & (long) Integer.MAX_VALUE);
+                    case 0 -> (int) (progress & (long) -1);
+                    case 1 -> (int) (progress >> Integer.SIZE & (long) -1);
+                    case 2 -> (int) (getSingularityDensity() & (long) -1);
+                    case 3 -> (int) (getSingularityDensity() >> Integer.SIZE & (long) -1);
                     default -> 0;
                 };
             }
@@ -82,7 +84,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             }
             @Override
             public int getCount() {
-                return 2;
+                return 4;
             }
         };
     }
@@ -107,7 +109,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         if (getCompressedStack().isEmpty()) {
             return;
         }
-        long singularityDensity = SINGULARITY_DENSITY.get();
+        long singularityDensity = this.getSingularityDensity();
         if (progress >= singularityDensity) {
             long singularityCount = progress / singularityDensity;
             int remainSlot = internalOutputHandler.getSlotLimit(0) - internalOutputHandler.getStackInSlot(0).getCount();
@@ -116,6 +118,10 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             ItemStack overflowedStack = internalOutputHandler.insertItem(0, singularityStack, false);
             progress -= (actualSingularityCount - overflowedStack.getCount()) * singularityDensity;
         }
+    }
+
+    public long getSingularityDensity() {
+        return SINGULARITY_DENSITY.get();
     }
 
     public ItemStack getCompressedStack() {
@@ -127,7 +133,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
     }
 
     public boolean isValidStack(ItemStack stack) {
-        return getCompressedStack().isEmpty() || ItemStack.isSameItemSameTags(getCompressedStack(), stack);
+        return getProgress() < Long.MAX_VALUE && getCompressedStack().isEmpty() || ItemStack.isSameItemSameTags(getCompressedStack(), stack);
     }
 
     public long getProgress() {
@@ -145,7 +151,9 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         if (getCompressedStack().isEmpty()) {
             setCompressedStack(stack.copyWithCount(1));
         }
-        progress += count;
+        long overflowedAmount = progress + count - Long.MAX_VALUE;
+        boolean overflowed = overflowedAmount > 0;
+        progress = overflowed ? Long.MAX_VALUE : progress + count;
     }
 
     public void addStack(ItemStack stack) {

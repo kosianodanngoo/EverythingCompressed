@@ -13,6 +13,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+@SuppressWarnings("removal")
 @Mod(EverythingCompressed.MOD_ID)
 public class EverythingCompressed {
 

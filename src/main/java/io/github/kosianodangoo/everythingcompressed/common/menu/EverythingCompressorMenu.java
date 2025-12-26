@@ -23,7 +23,7 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     public final ContainerData data;
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(1));
+        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(4));
     }
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, EverythingCompressorBlockEntity blockEntity, ContainerData data) {
@@ -41,9 +41,12 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     }
 
     public long getProgress() {
-        return (long) data.get(0) | (long) data.get(1) << 32;
+        return Integer.toUnsignedLong(data.get(0)) | (long) data.get(1) << Integer.SIZE;
     }
 
+    public long getRequired() {
+        return Integer.toUnsignedLong(data.get(2)) | (long) data.get(3) << Integer.SIZE;
+    }
 
     @Override
     public ItemStack quickMoveStack(Player player, int i) {
