@@ -22,14 +22,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public class SingularityItem extends Item {
-    public static final ResourceLocation modelLocation = new ModelResourceLocation(ResourceLocationUtil.getResourceLocation("custom/singularity"), "inventory");
-
+    public static ResourceLocation modelLocation = null;
 
     public SingularityItem(Properties p_41383_) {
         super(p_41383_);
@@ -99,7 +99,8 @@ public class SingularityItem extends Item {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        EverythingCompressed.LOGGER.debug("Singularity initialized");
+        if (modelLocation == null)
+            modelLocation = new ModelResourceLocation(ResourceLocationUtil.getResourceLocation("custom/singularity"), "inventory");
         consumer.accept(new IClientItemExtensions() {
             private final SingularityItemRenderer renderer = new SingularityItemRenderer(modelLocation);
 

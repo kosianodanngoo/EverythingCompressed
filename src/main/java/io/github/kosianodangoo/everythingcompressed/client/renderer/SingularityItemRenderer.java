@@ -68,7 +68,6 @@ public class SingularityItemRenderer extends BlockEntityWithoutLevelRenderer {
         model = ForgeHooksClient.handleCameraTransforms(pPose, model, pContext, pContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || pContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND);
         pPose.translate(-0.5, -0.5, -0.5);
         renderSourceModel(pStack, pContext, pPose, pVertexConsumer, pPackedLight, pPackedOverlay, compressionInfo, model);
-        long millis = Util.getMillis();
     }
 
     public void renderSourceModel(ItemStack pStack, ItemDisplayContext pContext, PoseStack pPose, VertexConsumer pVertexConsumer, int pPackedLight, int pPackedOverlay, ICompressionInfo compressionInfo, BakedModel model) {
