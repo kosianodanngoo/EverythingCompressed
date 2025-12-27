@@ -6,18 +6,24 @@ import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.RandomSequence;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.logging.Level;
+
 @OnlyIn(Dist.CLIENT)
 public class SingularityItemRenderer extends BlockEntityWithoutLevelRenderer {
+    public static final RandomSource RANDOM = RandomSource.create();
     public SingularityItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
@@ -45,11 +51,19 @@ public class SingularityItemRenderer extends BlockEntityWithoutLevelRenderer {
     public void renderModel(ItemStack pStack, ItemDisplayContext pContext, PoseStack pPose, MultiBufferSource pBuf, VertexConsumer pVertexConsumer, int pPackedLight, int pPackedOverlay, ICompressionInfo compressionInfo) {
         long millis = Util.getMillis();
         double time = (double) (millis % 3000 - 1500) / 1000;
+        double delta = time * time * time * time;
         double brightness = compressionInfo.getCompressionTime() != -1 ? (float) (1f / Math.sqrt(compressionInfo.getCompressionTime() + 1)) : 1;
-        brightness *= Math.cos(time * time * time * time);
+        brightness *= Math.abs(Math.cos(delta));
 
         pPose.pushPose();
         pPose.translate(0.5, 0.5, 0.5);
+
+        ClientLevel level = Minecraft.getInstance().level;
+        RandomSource random = level != null ? level.getRandom() : RANDOM;
+        double multiplier = 0.05;
+        pPose.translate(multiplier * random.nextGaussian(), multiplier * random.nextGaussian(), multiplier * random.nextGaussian());
+        float size = 2 - Math.abs((float)Math.cos(delta));
+        pPose.scale(size, size, size);
         BakedModel sourceStackModel = Minecraft.getInstance().getItemRenderer().getModel(compressionInfo.getSourceStack(), Minecraft.getInstance().level, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getItemRenderer().render(compressionInfo.getSourceStack(), pContext, false, pPose, pBuf, darkenLight(pPackedLight, brightness), pPackedOverlay, sourceStackModel);
         pPose.popPose();
