@@ -6,16 +6,14 @@ import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTy
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
-import io.github.kosianodangoo.everythingcompressed.utils.MathUtil;
+import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -25,7 +23,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -34,7 +31,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import net.minecraftforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -157,7 +153,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         if (getCompressedStack().isEmpty()) {
             setCompressedStack(stack.copyWithCount(1));
         }
-        progress = MathUtil.overflowingAdd(progress, count);
+        progress = EverythingMathUtil.overflowingAdd(progress, count);
     }
 
     public void addStack(ItemStack stack) {

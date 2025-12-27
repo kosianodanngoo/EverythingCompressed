@@ -4,7 +4,7 @@ import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
-import io.github.kosianodangoo.everythingcompressed.utils.MathUtil;
+import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -104,14 +104,14 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
         if (getStoredStack().isEmpty()) {
             return;
         }
-        progress = MathUtil.overflowingAdd(progress, stored);
+        progress = EverythingMathUtil.overflowingAdd(progress, stored);
         if (getProductStack().isEmpty()) {
             setProductStack(CompressionInfoUtil.getCompressedStack(getStoredStack()).orElse(ItemStack.EMPTY));
         }
         long extractionTime = getExtractionTime();
         if (progress >= extractionTime) {
             long production = progress / extractionTime;
-            product = MathUtil.overflowingAdd(product, production);
+            product = EverythingMathUtil.overflowingAdd(product, production);
             progress -= production * extractionTime;
         }
     }
@@ -135,7 +135,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
         if (getStoredStack().isEmpty()) {
             setStoredStack(stack.copyWithCount(1));
         }
-        stored = MathUtil.overflowingAdd(stored, count);
+        stored = EverythingMathUtil.overflowingAdd(stored, count);
     }
 
     public void addStack(ItemStack stack) {
