@@ -52,7 +52,7 @@ public class EverythingCompressorBlock extends Block implements EntityBlock {
         if (pState.getBlock() != pNewState.getBlock()){
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if(blockEntity instanceof EverythingCompressorBlockEntity everythingCompressorBlockEntity){
-                everythingCompressorBlockEntity.dropInventory();
+                everythingCompressorBlockEntity.dropInventory(pLevel, pPos);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);

@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -103,8 +104,9 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         }
     }
 
-    public void dropInventory() {
-        Containers.dropContents(this.level, this.getBlockPos(), NonNullList.of(this.combinedInv.getStackInSlot(0)));
+    public void dropInventory(Level pLevel, BlockPos pPos) {
+        Containers.dropContents(pLevel, pPos, NonNullList.of(ItemStack.EMPTY, this.outputHandler.getStackInSlot(0)));
+        outputHandler.setStackInSlot(0, ItemStack.EMPTY);
     }
 
     public void processCompressing() {
