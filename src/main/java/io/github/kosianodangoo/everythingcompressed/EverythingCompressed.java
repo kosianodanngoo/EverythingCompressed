@@ -5,6 +5,7 @@ import io.github.kosianodangoo.everythingcompressed.common.init.ModBlocks;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModItems;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
+import io.github.kosianodangoo.everythingcompressed.common.network.EverythingCompressedConnection;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -28,6 +29,8 @@ public class EverythingCompressed {
         ModItems.register(modEventBus);
         ModBlockEntityTypes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+
+        EverythingCompressedConnection.init();
 
         MinecraftForge.EVENT_BUS.register(this);
 

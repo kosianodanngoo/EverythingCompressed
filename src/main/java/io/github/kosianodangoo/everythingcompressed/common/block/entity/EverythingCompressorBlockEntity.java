@@ -1,9 +1,11 @@
 package io.github.kosianodangoo.everythingcompressed.common.block.entity;
 
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
+import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
+import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -133,7 +135,8 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
     }
 
     public boolean isValidStack(ItemStack stack) {
-        return getProgress() < Long.MAX_VALUE && getCompressedStack().isEmpty() || ItemStack.isSameItemSameTags(getCompressedStack(), stack);
+        ICompressionInfo compressionInfo = CompressionInfoUtil.getCompressionInfo(stack);
+        return getProgress() < Long.MAX_VALUE && getCompressedStack().isEmpty() && (compressionInfo == null || compressionInfo.getCompressionTime() < Long.MAX_VALUE) || ItemStack.isSameItemSameTags(getCompressedStack(), stack);
     }
 
     public long getProgress() {

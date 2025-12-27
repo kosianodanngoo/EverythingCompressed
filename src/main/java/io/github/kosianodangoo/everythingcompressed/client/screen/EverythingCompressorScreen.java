@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 public class EverythingCompressorScreen extends AbstractContainerScreen<EverythingCompressorMenu> {
     private static final ResourceLocation TEXTURE =
@@ -35,9 +36,13 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
         int y = (height - this.imageHeight) / 2;
         long required = menu.getRequired();
         if(required > 0)
-            guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.required", required), imageWidth/2 + x, 20 + y, 4210752);
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.required", required), imageWidth/2 + x, 16 + y, 4210752);
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.progress", menu.getProgress()), imageWidth/2 + x, 30 + y, 4210752);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.progress", menu.getProgress()), imageWidth/2 + x, 26 + y, 4210752);
+
+        ItemStack compressedStack = menu.getCompressedStack();
+        if (!compressedStack.isEmpty())
+            guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.compressing", compressedStack.getDisplayName()), imageWidth/2 + x, 36 + y, 4210752);
 
         guiGraphics.blit(TEXTURE,x,y,0,0, 256, 256, 256, 256);
     }

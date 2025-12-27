@@ -3,12 +3,17 @@ package io.github.kosianodangoo.everythingcompressed.common.menu;
 import io.github.kosianodangoo.everythingcompressed.common.block.entity.EverythingCompressorBlockEntity;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
+import io.github.kosianodangoo.everythingcompressed.common.network.EverythingCompressedConnection;
+import io.github.kosianodangoo.everythingcompressed.common.network.clientbound.ClientboundUpdateCompressedStackPacket;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 public class EverythingCompressorMenu extends AbstractContainerMenu {
@@ -21,6 +26,9 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
 
     public final EverythingCompressorBlockEntity blockEntity;
     public final ContainerData data;
+    public final Player player;
+
+    public ItemStack lastCompressing = ItemStack.EMPTY;
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
         this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(4));
@@ -28,6 +36,7 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, EverythingCompressorBlockEntity blockEntity, ContainerData data) {
         super(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), pContainerId);
+        this.player = inventory.player;
         this.blockEntity = blockEntity;
         this.data = data;
 
@@ -46,6 +55,10 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
 
     public long getRequired() {
         return Integer.toUnsignedLong(data.get(2)) | (long) data.get(3) << Integer.SIZE;
+    }
+
+    public ItemStack getCompressedStack() {
+        return blockEntity.getCompressedStack();
     }
 
     @Override
@@ -181,4 +194,32 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
             }
         }
     }
+
+    @Override
+    public void sendAllDataToRemote() {
+        super.sendAllDataToRemote();
+        if (!ItemStack.isSameItemSameTags(this.getCompressedStack(), this.lastCompressing)) {
+            updateCompressedStack();
+        }
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        if (!ItemStack.isSameItemSameTags(this.getCompressedStack(), this.lastCompressing)) {
+            updateCompressedStack();
+        }
+    }
+
+    public void updateCompressedStack() {
+        if (this.player instanceof ServerPlayer serverPlayer){
+            this.lastCompressing = this.getCompressedStack();
+            EverythingCompressedConnection.INSTANCE.send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new ClientboundUpdateCompressedStackPacket(this.lastCompressing, this.blockEntity.getBlockPos())
+            );
+        }
+    }
+
+
 }
