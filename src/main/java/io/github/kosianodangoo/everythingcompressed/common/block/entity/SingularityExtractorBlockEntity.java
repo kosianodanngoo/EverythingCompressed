@@ -3,6 +3,8 @@ package io.github.kosianodangoo.everythingcompressed.common.block.entity;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
+import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
+import io.github.kosianodangoo.everythingcompressed.common.menu.SingularityExtractorMenu;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.core.BlockPos;
@@ -13,6 +15,8 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,10 +39,13 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
     public static final String STORED_AMOUNT_NBT = "storedAmount";
     public static final String STORED_NBT = "stored";
 
+    public final ContainerData data;
+
     private static ForgeConfigSpec.LongValue EXTRACTION_TIME = EverythingCompressedConfig.EXTRACTION_TIME;
 
     public ExtractorItemInputHandler inputHandler = new ExtractorItemInputHandler();
     public ExtractorItemOutputHandler outputHandler = new ExtractorItemOutputHandler();
+    public IItemHandler slotOutputHandler = new ExtractorSlotItemOutputHandler();
     public CombinedInvWrapper combinedInv = new CombinedInvWrapper(inputHandler, outputHandler);
 
     public LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> combinedInv);
@@ -52,6 +59,29 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
     public SingularityExtractorBlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
         super(p_155228_, p_155229_, p_155230_);
+        this.data = new ContainerData() {
+            @Override
+            public int get(int i) {
+                return switch (i) {
+                    case 0 -> (int) (progress & (long) -1);
+                    case 1 -> (int) (progress >> Integer.SIZE & (long) -1);
+                    case 2 -> (int) (getStored() & (long) -1);
+                    case 3 -> (int) (getStored() >> Integer.SIZE & (long) -1);
+                    case 4 -> (int) (product & (long) -1);
+                    case 5 -> (int) (product >> Integer.SIZE & (long) -1);
+                    case 6 -> (int) (getExtractionTime() & (long) -1);
+                    case 7 -> (int) (getExtractionTime() >> Integer.SIZE & (long) -1);
+                    default -> 0;
+                };
+            }
+            @Override
+            public void set(int i, int i1) {
+            }
+            @Override
+            public int getCount() {
+                return 8;
+            }
+        };
     }
 
     public SingularityExtractorBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
@@ -65,7 +95,12 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return null;
+        return new SingularityExtractorMenu(i, inventory, this, this.data);
+    }
+
+
+    public IItemHandlerModifiable getInventory() {
+        return this.combinedInv;
     }
 
     public long getProgress() {
@@ -82,6 +117,14 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
     public void setStoredStack(ItemStack stack) {
         this.storedStack = stack;
+    }
+
+    public long getProduct() {
+        return product;
+    }
+
+    public void setProduct(long amount) {
+        this.product = amount;
     }
 
     public ItemStack getProductStack() {
@@ -218,7 +261,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public @NotNull ItemStack getStackInSlot(int i) {
-            return storedStack.copyWithCount((int) stored);
+            return productStack.copyWithCount((int) product);
         }
 
         @Override
@@ -253,6 +296,55 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
                 SingularityExtractorBlockEntity.this.product = itemStack.getCount();
             }
             SingularityExtractorBlockEntity.this.setProductStack(itemStack.copyWithCount(1));
+        }
+    }
+
+    public class ExtractorSlotItemOutputHandler implements IItemHandlerModifiable {
+        ItemStack toDisplay = ItemStack.EMPTY;
+
+        @Override
+        public int getSlots() {
+            return 1;
+        }
+
+        @Override
+        public @NotNull ItemStack getStackInSlot(int i) {
+            int count = Math.min(getSlotLimit(i), (int) product);
+            return productStack.copyWithCount(count);
+        }
+
+        @Override
+        public @NotNull ItemStack insertItem(int i, @NotNull ItemStack itemStack, boolean b) {
+            return itemStack;
+        }
+
+        @Override
+        public @NotNull ItemStack extractItem(int i, int i1, boolean simulate) {
+            int count = Math.min(i1, (int) product);
+            if (!simulate) {
+                product -= count;
+            }
+            return productStack.copyWithCount(count);
+        }
+
+        @Override
+        public int getSlotLimit(int i) {
+            return 64;
+        }
+
+        @Override
+        public boolean isItemValid(int i, @NotNull ItemStack itemStack) {
+            return false;
+        }
+
+        @Override
+        public void setStackInSlot(int i, @NotNull ItemStack itemStack) {
+            int delta = itemStack.getCount() - this.getStackInSlot(i).getCount();
+            product = EverythingMathUtil.overflowingAdd(product, delta);
+            if (!ItemStack.isSameItemSameTags(productStack, itemStack)) {
+                productStack = itemStack.copyWithCount(1);
+                product = itemStack.getCount();
+            }
         }
     }
 }

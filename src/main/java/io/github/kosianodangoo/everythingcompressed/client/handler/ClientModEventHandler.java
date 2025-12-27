@@ -2,6 +2,7 @@ package io.github.kosianodangoo.everythingcompressed.client.handler;
 
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
 import io.github.kosianodangoo.everythingcompressed.client.screen.EverythingCompressorScreen;
+import io.github.kosianodangoo.everythingcompressed.client.screen.SingularityExtractorScreen;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -15,6 +16,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientModEventHandler {
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> MenuScreens.register(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), EverythingCompressorScreen::new));
+        event.enqueueWork(() -> {
+            MenuScreens.register(ModMenuTypes.EVERYTHING_COMPRESSOR.get(), EverythingCompressorScreen::new);
+            MenuScreens.register(ModMenuTypes.SINGULARITY_EXTRACTOR.get(), SingularityExtractorScreen::new);
+        });
     }
 }
