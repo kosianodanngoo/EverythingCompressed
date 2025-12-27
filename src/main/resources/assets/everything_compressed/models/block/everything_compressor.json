@@ -1,0 +1,13 @@
+{
+  "render_type": "cutout",
+  "parent": "block/cube",
+  "textures": {
+    "north": "everything_compressed:block/everything_compressor/front",
+    "east": "everything_compressed:block/everything_compressor/side",
+    "south": "everything_compressed:block/everything_compressor/casing",
+    "west": "everything_compressed:block/everything_compressor/side",
+    "up": "everything_compressed:block/everything_compressor/casing",
+    "down": "everything_compressed:block/everything_compressor/casing",
+    "particle": "everything_compressed:block/everything_compressor/front"
+  }
+}

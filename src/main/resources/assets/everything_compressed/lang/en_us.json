@@ -1,4 +1,6 @@
 {
+    "itemGroup.tab.everything_compressed" : "Everything Compressed",
+
     "item.everything_compressed.singularity.single": "%s Singularity",
     "item.everything_compressed.singularity.multiple": "%sx %s Singularity",
     "item.everything_compressed.singularity.tooltip.density": "Density: %s",

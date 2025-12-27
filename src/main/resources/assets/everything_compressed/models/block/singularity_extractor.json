@@ -1,0 +1,13 @@
+{
+  "render_type": "cutout",
+  "parent": "block/cube",
+  "textures": {
+    "north": "everything_compressed:block/singularity_extractor/front",
+    "east": "everything_compressed:block/singularity_extractor/side",
+    "south": "everything_compressed:block/singularity_extractor/casing",
+    "west": "everything_compressed:block/singularity_extractor/side",
+    "up": "everything_compressed:block/singularity_extractor/casing",
+    "down": "everything_compressed:block/singularity_extractor/casing",
+    "particle": "everything_compressed:block/singularity_extractor/front"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "everything_compressed:block/everything_compressor" },
+    "facing=east": { "model": "everything_compressed:block/everything_compressor" ,"y": 90},
+    "facing=south": { "model": "everything_compressed:block/everything_compressor" ,"y": 180},
+    "facing=west": { "model": "everything_compressed:block/everything_compressor" ,"y": 270}
+  }
+}

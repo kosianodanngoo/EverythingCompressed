@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "everything_compressed:block/singularity_extractor" },
+    "facing=east": { "model": "everything_compressed:block/singularity_extractor" ,"y": 90},
+    "facing=south": { "model": "everything_compressed:block/singularity_extractor" ,"y": 180},
+    "facing=west": { "model": "everything_compressed:block/singularity_extractor" ,"y": 270}
+  }
+}
