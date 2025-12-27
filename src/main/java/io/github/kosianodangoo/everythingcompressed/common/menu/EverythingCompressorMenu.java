@@ -1,10 +1,12 @@
 package io.github.kosianodangoo.everythingcompressed.common.menu;
 
+import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
 import io.github.kosianodangoo.everythingcompressed.common.block.entity.EverythingCompressorBlockEntity;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
 import io.github.kosianodangoo.everythingcompressed.common.network.EverythingCompressedConnection;
 import io.github.kosianodangoo.everythingcompressed.common.network.clientbound.ClientboundUpdateCompressedStackPacket;
+import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,7 +33,7 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     public ItemStack lastCompressing = ItemStack.EMPTY;
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(4));
+        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(12));
     }
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, EverythingCompressorBlockEntity blockEntity, ContainerData data) {
@@ -40,8 +42,8 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
         this.blockEntity = blockEntity;
         this.data = data;
 
-        addSlot(new SlotItemHandler(blockEntity.getInventory(), 0, 44, 47));
-        addSlot(new SlotItemHandler(blockEntity.getInventory(), 1, 116, 47));
+        addSlot(new SlotItemHandler(blockEntity.getInventory(), 0, 44, 57));
+        addSlot(new SlotItemHandler(blockEntity.slotOutputHandler, 0, 116, 57));
 
         addPlayerHotbar(inventory);
         addPlayerInventory(inventory);
@@ -50,11 +52,15 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     }
 
     public long getProgress() {
-        return Integer.toUnsignedLong(data.get(0)) | (long) data.get(1) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(3), data.get(2), data.get(1), data.get(0));
     }
 
     public long getRequired() {
-        return Integer.toUnsignedLong(data.get(2)) | (long) data.get(3) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(7), data.get(6), data.get(5), data.get(4));
+    }
+
+    public long getProduct() {
+        return EverythingMathUtil.combineStort(data.get(11), data.get(10), data.get(9), data.get(8));
     }
 
     public ItemStack getCompressedStack() {
@@ -183,14 +189,14 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < PLAYER_HOTBAR_SLOTS; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 152));
         }
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < PLAYER_INVENTORY_ROWS; ++i) {
             for (int l = 0; l < PLAYER_INVENTORY_COLUMNS; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 94 + i * 18));
             }
         }
     }

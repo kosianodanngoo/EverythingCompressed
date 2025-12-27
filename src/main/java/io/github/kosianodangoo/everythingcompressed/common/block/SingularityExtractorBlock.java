@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -30,7 +31,7 @@ public class SingularityExtractorBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public SingularityExtractorBlock()  {
-        this(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(2.0F, 3.0F));
+        this(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(5.0F, 10.0F));
     }
 
     public SingularityExtractorBlock(BlockBehaviour.Properties p_49795_) {
@@ -41,6 +42,12 @@ public class SingularityExtractorBlock extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction direction = context.getHorizontalDirection().getOpposite();
+        return this.defaultBlockState().setValue(FACING, direction);
     }
 
     @Override

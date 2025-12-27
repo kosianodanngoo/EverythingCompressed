@@ -3,7 +3,6 @@ package io.github.kosianodangoo.everythingcompressed.common.block.entity;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
-import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
 import io.github.kosianodangoo.everythingcompressed.common.menu.SingularityExtractorMenu;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
@@ -16,7 +15,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -62,15 +60,13 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
         this.data = new ContainerData() {
             @Override
             public int get(int i) {
-                return switch (i) {
-                    case 0 -> (int) (progress & (long) -1);
-                    case 1 -> (int) (progress >> Integer.SIZE & (long) -1);
-                    case 2 -> (int) (getStored() & (long) -1);
-                    case 3 -> (int) (getStored() >> Integer.SIZE & (long) -1);
-                    case 4 -> (int) (product & (long) -1);
-                    case 5 -> (int) (product >> Integer.SIZE & (long) -1);
-                    case 6 -> (int) (getExtractionTime() & (long) -1);
-                    case 7 -> (int) (getExtractionTime() >> Integer.SIZE & (long) -1);
+                int index = i >> 2;
+                int shortindex = i & 3;
+                return switch (index) {
+                    case 0 -> (int) (progress >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                    case 1 -> (int) (getStored() >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                    case 2 -> (int) (product >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                    case 3 -> (int) (getExtractionTime() >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
                     default -> 0;
                 };
             }
@@ -79,7 +75,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
             }
             @Override
             public int getCount() {
-                return 8;
+                return 16;
             }
         };
     }
@@ -261,7 +257,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public @NotNull ItemStack getStackInSlot(int i) {
-            return productStack.copyWithCount((int) product);
+            return productStack.copyWithCount(EverythingMathUtil.overflowingLongToInt(product));
         }
 
         @Override
@@ -271,7 +267,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public @NotNull ItemStack extractItem(int i, int i1, boolean simulate) {
-            int count = Math.min(i1, (int) product);
+            int count = Math.min(i1, EverythingMathUtil.overflowingLongToInt(product));
             if (!simulate) {
                 product -= count;
             }
@@ -300,8 +296,6 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
     }
 
     public class ExtractorSlotItemOutputHandler implements IItemHandlerModifiable {
-        ItemStack toDisplay = ItemStack.EMPTY;
-
         @Override
         public int getSlots() {
             return 1;
@@ -309,7 +303,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public @NotNull ItemStack getStackInSlot(int i) {
-            int count = Math.min(getSlotLimit(i), (int) product);
+            int count = Math.min(getSlotLimit(i), EverythingMathUtil.overflowingLongToInt(product));
             return productStack.copyWithCount(count);
         }
 
@@ -320,7 +314,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public @NotNull ItemStack extractItem(int i, int i1, boolean simulate) {
-            int count = Math.min(i1, (int) product);
+            int count = Math.min(i1, EverythingMathUtil.overflowingLongToInt(product));
             if (!simulate) {
                 product -= count;
             }
@@ -329,7 +323,7 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
 
         @Override
         public int getSlotLimit(int i) {
-            return 64;
+            return productStack.getMaxStackSize();
         }
 
         @Override
@@ -341,9 +335,8 @@ public class SingularityExtractorBlockEntity extends BlockEntity implements Menu
         public void setStackInSlot(int i, @NotNull ItemStack itemStack) {
             int delta = itemStack.getCount() - this.getStackInSlot(i).getCount();
             product = EverythingMathUtil.overflowingAdd(product, delta);
-            if (!ItemStack.isSameItemSameTags(productStack, itemStack)) {
+            if (!ItemStack.isSameItemSameTags(productStack, itemStack) && level.isClientSide()) {
                 productStack = itemStack.copyWithCount(1);
-                product = itemStack.getCount();
             }
         }
     }

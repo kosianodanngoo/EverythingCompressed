@@ -1,0 +1,6 @@
+{
+  "values": [
+    "everything_compressed:everything_compressor",
+    "everything_compressed:singularity_extractor"
+  ]
+}

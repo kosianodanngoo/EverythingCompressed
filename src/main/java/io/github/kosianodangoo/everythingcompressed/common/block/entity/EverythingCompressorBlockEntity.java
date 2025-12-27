@@ -9,10 +9,8 @@ import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,15 +27,15 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class EverythingCompressorBlockEntity extends BlockEntity implements MenuProvider {
     public static final String PROGRESS_NBT = "progress";
-    public static final String COMPRESSED_STACK_NBT = "compressed_stack";
-    public static final String OUTPUT_NBT = "output";
+    public static final String COMPRESSED_STACK_NBT = "compressedStack";
+    public static final String PRODUCT_AMOUNT_NBT = "productAmount";
+    public static final String PRODUCT_NBT = "product";
     public static final String LOCKED_NBT = "locked";
 
     public final ContainerData data;
@@ -45,24 +43,16 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
     private static ForgeConfigSpec.LongValue SINGULARITY_DENSITY = EverythingCompressedConfig.SINGULARITY_DENSITY;
 
     public CompressorItemInputHandler inputHandler = new CompressorItemInputHandler();
-    public ItemStackHandler internalOutputHandler = new ItemStackHandler(1);
-    public IItemHandlerModifiable outputHandler = new CombinedInvWrapper(internalOutputHandler) {
-        @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            return false;
-        }
-
-        @Override
-        public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-            return stack;
-        }
-    };
+    public CompressorItemOutputHandler outputHandler = new CompressorItemOutputHandler();
+    public CompressorSlotItemOutputHandler slotOutputHandler = new CompressorSlotItemOutputHandler();
     public CombinedInvWrapper combinedInv = new CombinedInvWrapper(inputHandler, outputHandler);
 
     public LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> combinedInv);
 
+    private ItemStack productStack = ItemStack.EMPTY;
     private ItemStack compressedStack = ItemStack.EMPTY;
     private long progress = 0;
+    private long product = 0;
 
     private boolean isLocked = false;
 
@@ -71,11 +61,12 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         this.data = new ContainerData() {
             @Override
             public int get(int i) {
-                return switch (i) {
-                    case 0 -> (int) (progress & (long) -1);
-                    case 1 -> (int) (progress >> Integer.SIZE & (long) -1);
-                    case 2 -> (int) (getSingularityDensity() & (long) -1);
-                    case 3 -> (int) (getSingularityDensity() >> Integer.SIZE & (long) -1);
+                int index = i >> 2;
+                int shortindex = i & 3;
+                return switch (index) {
+                    case 0 -> (int) (progress >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                    case 1 -> (int) (getSingularityDensity() >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                    case 2 -> (int) (product >> ((Short.SIZE) * shortindex) & EverythingMathUtil.SHORT_MASK);
                     default -> 0;
                 };
             }
@@ -84,7 +75,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             }
             @Override
             public int getCount() {
-                return 4;
+                return 12;
             }
         };
     }
@@ -96,14 +87,10 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         processCompressing();
-        if (progress <= 0 && !isLocked() && outputHandler.getStackInSlot(0).isEmpty()) {
+        if (progress <= 0 && !isLocked() && product <= 0) {
             setCompressedStack(ItemStack.EMPTY);
+            setProductStack(ItemStack.EMPTY);
         }
-    }
-
-    public void dropInventory(Level pLevel, BlockPos pPos) {
-        Containers.dropContents(pLevel, pPos, NonNullList.of(ItemStack.EMPTY, this.outputHandler.getStackInSlot(0)));
-        outputHandler.setStackInSlot(0, ItemStack.EMPTY);
     }
 
     public void processCompressing() {
@@ -112,12 +99,12 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         }
         long singularityDensity = this.getSingularityDensity();
         if (progress >= singularityDensity) {
+            if (getProductStack().isEmpty()) {
+                setProductStack(SingularityItem.fromSourceStack(getCompressedStack()));
+            }
             long singularityCount = progress / singularityDensity;
-            int remainSlot = internalOutputHandler.getSlotLimit(0) - internalOutputHandler.getStackInSlot(0).getCount();
-            int actualSingularityCount = Math.min((int)singularityCount, remainSlot);
-            ItemStack singularityStack = SingularityItem.fromSourceStack(this.getCompressedStack(), actualSingularityCount);
-            ItemStack overflowedStack = internalOutputHandler.insertItem(0, singularityStack, false);
-            progress -= (actualSingularityCount - overflowedStack.getCount()) * singularityDensity;
+            product = EverythingMathUtil.overflowingAdd(product, singularityCount);
+            progress -= singularityCount * singularityDensity;
         }
     }
 
@@ -131,6 +118,14 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
 
     public void setCompressedStack(ItemStack stack) {
         this.compressedStack = stack;
+    }
+
+    public ItemStack getProductStack() {
+        return productStack;
+    }
+
+    public void setProductStack(ItemStack stack) {
+        this.productStack = stack;
     }
 
     public boolean isValidStack(ItemStack stack) {
@@ -154,6 +149,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             setCompressedStack(stack.copyWithCount(1));
         }
         progress = EverythingMathUtil.overflowingAdd(progress, count);
+        processCompressing();
     }
 
     public void addStack(ItemStack stack) {
@@ -181,7 +177,8 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         super.saveAdditional(compoundTag);
         compoundTag.putLong(PROGRESS_NBT, getProgress());
         compoundTag.put(COMPRESSED_STACK_NBT, this.getCompressedStack().serializeNBT());
-        compoundTag.put(OUTPUT_NBT, this.internalOutputHandler.serializeNBT());
+        compoundTag.put(PRODUCT_NBT, this.getProductStack().serializeNBT());
+        compoundTag.putLong(PRODUCT_AMOUNT_NBT, product);
         compoundTag.putBoolean(LOCKED_NBT, this.isLocked());
     }
 
@@ -190,7 +187,8 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         super.load(compoundTag);
         this.progress = compoundTag.getLong(PROGRESS_NBT);
         this.setCompressedStack(ItemStack.of(compoundTag.getCompound(COMPRESSED_STACK_NBT)));
-        this.internalOutputHandler.deserializeNBT(compoundTag.getCompound(OUTPUT_NBT));
+        this.setProductStack(ItemStack.of(compoundTag.getCompound(PRODUCT_NBT)));
+        this.product = compoundTag.getLong(PRODUCT_AMOUNT_NBT);
         this.setLocked(compoundTag.getBoolean(LOCKED_NBT));
     }
 
@@ -244,6 +242,99 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         @Override
         public void setStackInSlot(int i, @NotNull ItemStack itemStack) {
             EverythingCompressorBlockEntity.this.addStack(itemStack);
+        }
+    }
+
+
+    public class CompressorItemOutputHandler implements IItemHandlerModifiable {
+        @Override
+        public int getSlots() {
+            return 1;
+        }
+
+        @Override
+        public @NotNull ItemStack getStackInSlot(int i) {
+            return productStack.copyWithCount(EverythingMathUtil.overflowingLongToInt(product));
+        }
+
+        @Override
+        public @NotNull ItemStack insertItem(int i, @NotNull ItemStack itemStack, boolean simulate) {
+            return itemStack;
+        }
+
+        @Override
+        public @NotNull ItemStack extractItem(int i, int i1, boolean simulate) {
+            int count = Math.min(i1, EverythingMathUtil.overflowingLongToInt(product));
+            if (!simulate) {
+                product -= count;
+            }
+            return productStack.copyWithCount(count);
+        }
+
+        @Override
+        public int getSlotLimit(int i) {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public boolean isItemValid(int i, @NotNull ItemStack itemStack) {
+            return false;
+        }
+
+        @Override
+        public void setStackInSlot(int i, @NotNull ItemStack itemStack) {
+            if (ItemStack.isSameItemSameTags(getProductStack(),itemStack.copyWithCount(1))) {
+                EverythingCompressorBlockEntity.this.product += ((long) itemStack.getCount() - product);
+            } else {
+                EverythingCompressorBlockEntity.this.product = itemStack.getCount();
+            }
+            EverythingCompressorBlockEntity.this.setProductStack(itemStack.copyWithCount(1));
+        }
+    }
+
+    public class CompressorSlotItemOutputHandler implements IItemHandlerModifiable {
+        @Override
+        public int getSlots() {
+            return 1;
+        }
+
+        @Override
+        public @NotNull ItemStack getStackInSlot(int i) {
+            int count = Math.min(getSlotLimit(i), EverythingMathUtil.overflowingLongToInt(product));
+            return getProductStack().copyWithCount(count);
+        }
+
+        @Override
+        public @NotNull ItemStack insertItem(int i, @NotNull ItemStack itemStack, boolean b) {
+            return itemStack;
+        }
+
+        @Override
+        public @NotNull ItemStack extractItem(int i, int i1, boolean simulate) {
+            int count = Math.min(i1, EverythingMathUtil.overflowingLongToInt(product));
+            if (!simulate) {
+                product -= count;
+            }
+            return productStack.copyWithCount(count);
+        }
+
+        @Override
+        public int getSlotLimit(int i) {
+            return productStack.getMaxStackSize();
+        }
+
+        @Override
+        public boolean isItemValid(int i, @NotNull ItemStack itemStack) {
+            return false;
+        }
+
+        @Override
+        public void setStackInSlot(int i, @NotNull ItemStack itemStack) {
+            int delta = itemStack.getCount() - this.getStackInSlot(i).getCount();
+            product = EverythingMathUtil.overflowingAdd(product, delta);
+            if (!ItemStack.isSameItemSameTags(productStack, itemStack) && level.isClientSide()) {
+                productStack = itemStack.copyWithCount(1);
+            }
         }
     }
 }

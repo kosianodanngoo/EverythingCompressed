@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
@@ -32,11 +33,15 @@ public class SingularityExtractorScreen extends AbstractContainerScreen<Singular
         int x = (width - this.imageWidth) / 2;
         int y = (height - this.imageHeight) / 2;
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.singularity_extractor.progress", menu.getProgress()), imageWidth/2 + x, 26 + y, 4210752);
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.everything_compressor.stored", menu.getStored()), imageWidth/2 + x, 36 + y, 4210752);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.singularity_extractor.stored", menu.getStored()), imageWidth/2 + x, 26 + y, 4210752);
 
-        guiGraphics.blit(TEXTURE,x,y,0,0, 256, 256, 256, 256);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, Component.translatable("gui.everything_compressed.singularity_extractor.product", menu.getProduct()), imageWidth/2 + x, 36 + y, 4210752);
+
+        guiGraphics.blit(TEXTURE,x,y,0,0, this.imageWidth, this.imageHeight);
+
+        float progress = Mth.clamp((float) menu.getProgress() / (float) menu.getExtractionTime(), 0, 1);
+        guiGraphics.blit(TEXTURE,x+77,y+48, 176, 0, (int)(22 * progress), 15);
     }
 
     @Override

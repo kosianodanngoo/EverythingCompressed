@@ -3,8 +3,13 @@
     "item.everything_compressed.singularity.multiple": "%sx %s Singularity",
     "item.everything_compressed.singularity.tooltip.density": "Density: %s",
     "block.everything_compressed.everything_compressor": "Everything Compressor",
+    "block.everything_compressed.singularity_extractor": "Singularity Extractor",
 
     "gui.everything_compressed.everything_compressor.progress": "Progress: %s",
     "gui.everything_compressed.everything_compressor.required": "Required: %s",
-    "gui.everything_compressed.everything_compressor.compressing": "Compressing: %s"
+    "gui.everything_compressed.everything_compressor.compressing": "Compressing: %s",
+    "gui.everything_compressed.everything_compressor.product": "Produced: %s",
+
+    "gui.everything_compressed.singularity_extractor.stored": "Stored: %s",
+    "gui.everything_compressed.singularity_extractor.product": "Produced: %s"
 }

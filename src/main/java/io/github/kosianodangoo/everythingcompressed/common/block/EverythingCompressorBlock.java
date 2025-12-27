@@ -29,7 +29,7 @@ public class EverythingCompressorBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public EverythingCompressorBlock() {
-        this(Properties.of().sound(SoundType.METAL).strength(2.0F, 3.0F));
+        this(Properties.of().sound(SoundType.METAL).strength(5.0F, 10.0F));
     }
 
     public EverythingCompressorBlock(Properties p_49795_) {
@@ -45,17 +45,6 @@ public class EverythingCompressorBlock extends Block implements EntityBlock {
     @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return new EverythingCompressorBlockEntity(blockPos, blockState);
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (pState.getBlock() != pNewState.getBlock()){
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if(blockEntity instanceof EverythingCompressorBlockEntity everythingCompressorBlockEntity){
-                everythingCompressorBlockEntity.dropInventory(pLevel, pPos);
-            }
-        }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
     @Override

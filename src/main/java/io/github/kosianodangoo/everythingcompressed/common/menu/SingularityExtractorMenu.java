@@ -3,6 +3,7 @@ package io.github.kosianodangoo.everythingcompressed.common.menu;
 import io.github.kosianodangoo.everythingcompressed.common.block.entity.SingularityExtractorBlockEntity;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTypes;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModMenuTypes;
+import io.github.kosianodangoo.everythingcompressed.utils.EverythingMathUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +27,7 @@ public class SingularityExtractorMenu extends AbstractContainerMenu {
     public final Player player;
 
     public SingularityExtractorMenu(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.SINGULARITY_EXTRACTOR.get()).orElseThrow(), new SimpleContainerData(8));
+        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.SINGULARITY_EXTRACTOR.get()).orElseThrow(), new SimpleContainerData(16));
     }
 
     public SingularityExtractorMenu(int pContainerId, Inventory inventory, SingularityExtractorBlockEntity blockEntity, ContainerData data) {
@@ -45,19 +46,19 @@ public class SingularityExtractorMenu extends AbstractContainerMenu {
     }
 
     public long getProgress() {
-        return Integer.toUnsignedLong(data.get(0)) | (long) data.get(1) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(3), data.get(2), data.get(1), data.get(0));
     }
 
     public long getStored() {
-        return Integer.toUnsignedLong(data.get(2)) | (long) data.get(3) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(7), data.get(6), data.get(5), data.get(4));
     }
 
     public long getProduct() {
-        return Integer.toUnsignedLong(data.get(4)) | (long) data.get(5) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(11), data.get(10), data.get(9), data.get(8));
     }
 
     public long getExtractionTime() {
-        return Integer.toUnsignedLong(data.get(6)) | (long) data.get(7) << Integer.SIZE;
+        return EverythingMathUtil.combineStort(data.get(15), data.get(14), data.get(13), data.get(12));
     }
 
     @Override
