@@ -14,6 +14,7 @@ public class ModItems {
 
     public static RegistryObject<Item> SINGULARITY = ITEMS.register("singularity", () -> new SingularityItem(new Item.Properties()));
     public static RegistryObject<Item> EVERYTHING_COMPRESSOR = ITEMS.register("everything_compressor", () -> new BlockItem(ModBlocks.EVERYTHING_COMPRESSOR.get(), new Item.Properties()));
+    public static RegistryObject<Item> SINGULARITY_EXTRACTOR = ITEMS.register("singularity_extractor", () -> new BlockItem(ModBlocks.SINGULARITY_EXTRACTOR.get(), new Item.Properties()));
 
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);

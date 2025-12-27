@@ -6,6 +6,7 @@ import io.github.kosianodangoo.everythingcompressed.common.init.ModBlockEntityTy
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
+import io.github.kosianodangoo.everythingcompressed.utils.MathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -138,7 +139,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
 
     public boolean isValidStack(ItemStack stack) {
         ICompressionInfo compressionInfo = CompressionInfoUtil.getCompressionInfo(stack);
-        return getProgress() < Long.MAX_VALUE && getCompressedStack().isEmpty() && (compressionInfo == null || compressionInfo.getCompressionTime() < Long.MAX_VALUE) || ItemStack.isSameItemSameTags(getCompressedStack(), stack);
+        return (getCompressedStack().isEmpty() && (compressionInfo == null || compressionInfo.getCompressionTime() < Long.MAX_VALUE)) || (getProgress() < Long.MAX_VALUE &&  ItemStack.isSameItemSameTags(getCompressedStack(), stack));
     }
 
     public long getProgress() {
@@ -156,9 +157,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         if (getCompressedStack().isEmpty()) {
             setCompressedStack(stack.copyWithCount(1));
         }
-        long overflowedAmount = progress + count - Long.MAX_VALUE;
-        boolean overflowed = overflowedAmount > 0;
-        progress = overflowed ? Long.MAX_VALUE : progress + count;
+        progress = MathUtil.overflowingAdd(progress, count);
     }
 
     public void addStack(ItemStack stack) {
