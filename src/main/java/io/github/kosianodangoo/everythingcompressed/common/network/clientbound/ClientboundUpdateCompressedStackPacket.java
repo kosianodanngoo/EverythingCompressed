@@ -7,8 +7,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.Optional;
@@ -32,7 +30,6 @@ public class ClientboundUpdateCompressedStackPacket {
         return new ClientboundUpdateCompressedStackPacket(buf.readItem(), buf.readBlockPos());
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void handle(ClientboundUpdateCompressedStackPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         if (context.getDirection().getReceptionSide().isClient()) {
