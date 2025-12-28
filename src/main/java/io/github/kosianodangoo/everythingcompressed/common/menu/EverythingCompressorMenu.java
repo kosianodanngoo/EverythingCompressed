@@ -33,7 +33,7 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     public ItemStack lastCompressing = ItemStack.EMPTY;
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(12));
+        this(pContainerId, inventory, inventory.player.level().getBlockEntity(buf.readBlockPos(), ModBlockEntityTypes.EVERYTHING_COMPRESSOR.get()).orElseThrow(), new SimpleContainerData(13));
     }
 
     public EverythingCompressorMenu(int pContainerId, Inventory inventory, EverythingCompressorBlockEntity blockEntity, ContainerData data) {
@@ -61,6 +61,10 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
 
     public long getProduct() {
         return EverythingMathUtil.combineStort(data.get(11), data.get(10), data.get(9), data.get(8));
+    }
+
+    public boolean isLocked() {
+        return data.get(12) == 1;
     }
 
     public ItemStack getCompressedStack() {
@@ -204,9 +208,7 @@ public class EverythingCompressorMenu extends AbstractContainerMenu {
     @Override
     public void sendAllDataToRemote() {
         super.sendAllDataToRemote();
-        if (!ItemStack.isSameItemSameTags(this.getCompressedStack(), this.lastCompressing)) {
-            updateCompressedStack();
-        }
+        updateCompressedStack();
     }
 
     @Override

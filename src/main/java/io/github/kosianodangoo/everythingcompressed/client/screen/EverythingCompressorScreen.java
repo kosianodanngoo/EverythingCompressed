@@ -3,11 +3,14 @@ package io.github.kosianodangoo.everythingcompressed.client.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
+import io.github.kosianodangoo.everythingcompressed.common.network.EverythingCompressedConnection;
+import io.github.kosianodangoo.everythingcompressed.common.network.serverbound.ServerboundUpdateCompressorLockStatePacket;
 import io.github.kosianodangoo.everythingcompressed.utils.ResourceLocationUtil;
 import io.netty.util.internal.MathUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.LockIconButton;
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -21,12 +24,24 @@ import net.minecraft.world.item.ItemStack;
 public class EverythingCompressorScreen extends AbstractContainerScreen<EverythingCompressorMenu> {
     private static final ResourceLocation TEXTURE =
             ResourceLocationUtil.getResourceLocation("textures/gui/everything_compressor.png");
+    private LockIconButton lockButton;
 
     public EverythingCompressorScreen(EverythingCompressorMenu p_97741_, Inventory p_97742_, Component p_97743_) {
         super(p_97741_, p_97742_, p_97743_);
         this.imageWidth = 176;
         this.imageHeight = 176;
         this.inventoryLabelY = 80;
+    }
+
+    @Override
+    protected void init() {
+        int x = (width - this.imageWidth) / 2;
+        int y = (height - this.imageHeight) / 2;
+
+        super.init();
+        addRenderableWidget(lockButton = new CompressorLockButton(x + 17, y + 57, (button -> {
+            EverythingCompressedConnection.INSTANCE.sendToServer(new ServerboundUpdateCompressorLockStatePacket(!menu.isLocked(), this.menu.containerId));
+        })));
     }
 
     @Override
@@ -59,5 +74,22 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
         this.renderBackground(graphics);
         super.render(graphics, i, i1, v);
         this.renderTooltip(graphics, i, i1);
+    }
+
+    public class CompressorLockButton extends LockIconButton {
+        public CompressorLockButton(int p_94299_, int p_94300_, OnPress p_94301_) {
+            super(p_94299_, p_94300_, p_94301_);
+        }
+
+        @Override
+        public boolean isLocked() {
+            return menu.isLocked();
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics p_282701_, int p_282638_, int p_283565_, float p_282549_) {
+            this.setLocked(isLocked());
+            super.renderWidget(p_282701_, p_282638_, p_283565_, p_282549_);
+        }
     }
 }

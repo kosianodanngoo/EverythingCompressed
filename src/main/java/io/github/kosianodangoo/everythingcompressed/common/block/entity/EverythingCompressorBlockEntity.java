@@ -63,19 +63,28 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
             public int get(int i) {
                 int index = i >> 2;
                 int shortindex = i & 3;
-                return switch (index) {
-                    case 0 -> (int) (progress >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
-                    case 1 -> (int) (getSingularityDensity() >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
-                    case 2 -> (int) (product >> ((Short.SIZE) * shortindex) & EverythingMathUtil.SHORT_MASK);
+                if(index < 3) {
+                    return switch (index) {
+                        case 0 -> (int) (progress >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                        case 1 -> (int) (getSingularityDensity() >> (Short.SIZE * shortindex) & EverythingMathUtil.SHORT_MASK);
+                        case 2 -> (int) (product >> ((Short.SIZE) * shortindex) & EverythingMathUtil.SHORT_MASK);
+                        default -> 0;
+                    };
+                }
+                return switch (i) {
+                    case 12 -> isLocked() ? 1 : 0;
                     default -> 0;
                 };
             }
             @Override
             public void set(int i, int i1) {
+                if (i == 12) {
+                    setLocked(i1 == 1);
+                }
             }
             @Override
             public int getCount() {
-                return 12;
+                return 13;
             }
         };
     }
