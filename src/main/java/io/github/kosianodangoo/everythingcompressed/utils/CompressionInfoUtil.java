@@ -44,10 +44,14 @@ public class CompressionInfoUtil {
         if (!EverythingCompressedConfig.RANDOMIZE_EMPTY_SINGULARITY.get()) {
             return ItemStack.EMPTY;
         }
-        long millis = Util.getMillis();
-        List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
-        RANDOM.setSeed(millis / 200);
-        return items.get(RANDOM.nextInt(items.size())).getDefaultInstance();
+        try {
+            long millis = Util.getMillis();
+            List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
+            RANDOM.setSeed(millis / 200);
+            return items.get(RANDOM.nextInt(items.size())).getDefaultInstance();
+        } catch (Exception e) {
+            return ItemStack.EMPTY;
+        }
     }
 }
 
