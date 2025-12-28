@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class CompressionInfoUtil {
-    public static final RandomSource RANDOM = RandomSource.create();
 
     public static LazyOptional<ICompressionInfo> getLazyCompressionInfo(ItemStack stack) {
         return stack.getCapability(ModCapabilities.COMPRESSION_INFO);
@@ -45,10 +44,11 @@ public class CompressionInfoUtil {
             return ItemStack.EMPTY;
         }
         try {
+            RandomSource random = RandomSource.create();
             long millis = Util.getMillis();
             List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
-            RANDOM.setSeed(millis / 200);
-            return items.get(RANDOM.nextInt(items.size())).getDefaultInstance();
+            random.setSeed(millis / 200);
+            return items.get(random.nextInt(items.size())).getDefaultInstance();
         } catch (Exception e) {
             return ItemStack.EMPTY;
         }
