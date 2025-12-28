@@ -52,17 +52,21 @@ public class SingularityItemRenderer extends BlockEntityWithoutLevelRenderer {
         long millis = Util.getMillis();
         double time = (double) (millis % 3000 - 1500) / 1000;
         double delta = time * time * time * time;
+
+        ClientLevel level = Minecraft.getInstance().level;
+        RandomSource random = level != null ? level.getRandom() : RANDOM;
+        double randomScaleMultiplier = 0.1;
+        double randomScaling = (randomScaleMultiplier * random.nextGaussian()) + 1;
+
         double brightness = compressionInfo.getCompressionTime() != -1 ? (float) (1f / Math.sqrt(compressionInfo.getCompressionTime() + 1)) : 1;
         brightness *= Math.abs(Math.cos(delta));
 
         pPose.pushPose();
         pPose.translate(0.5, 0.5, 0.5);
 
-        ClientLevel level = Minecraft.getInstance().level;
-        RandomSource random = level != null ? level.getRandom() : RANDOM;
         double multiplier = 0.05;
         pPose.translate(multiplier * random.nextGaussian(), multiplier * random.nextGaussian(), multiplier * random.nextGaussian());
-        float size = 2 - Math.abs((float)Math.cos(delta));
+        float size = (2 - Math.abs((float)Math.cos(delta))) * (float) randomScaling;
         pPose.scale(size, size, size);
         BakedModel sourceStackModel = Minecraft.getInstance().getItemRenderer().getModel(compressionInfo.getSourceStack(), Minecraft.getInstance().level, Minecraft.getInstance().player, 0);
         Minecraft.getInstance().getItemRenderer().render(compressionInfo.getSourceStack(), pContext, false, pPose, pBuf, darkenLight(pPackedLight, brightness), pPackedOverlay, sourceStackModel);
