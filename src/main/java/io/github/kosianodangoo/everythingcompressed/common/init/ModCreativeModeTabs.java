@@ -23,7 +23,7 @@ public class ModCreativeModeTabs {
 
     public static final RegistryObject<CreativeModeTab> CREATIVE_TAB = TABS.register("everything_compressed", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.tab.everything_compressed"))
-            .icon(() -> SingularityItem.fromSourceStack(new ItemStack(Items.NETHER_STAR)))
+            .icon(() -> SingularityItem.fromSourceStack(Items.NETHER_STAR.getDefaultInstance()))
             .displayItems((parameters, output) -> {
                 for (var item : ITEMS) {
                     output.accept(item.get());

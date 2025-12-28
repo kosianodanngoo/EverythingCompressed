@@ -9,12 +9,14 @@ import io.github.kosianodangoo.everythingcompressed.common.init.ModCapabilities;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModItems;
 import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
 import io.github.kosianodangoo.everythingcompressed.utils.ResourceLocationUtil;
+import net.minecraft.Util;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,12 +25,17 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class SingularityItem extends Item {
+    public static final RandomSource RANDOM = RandomSource.create();
     public SingularityItem(Properties p_41383_) {
         super(p_41383_);
     }
@@ -105,5 +112,13 @@ public class SingularityItem extends Item {
                 return this.renderer;
             }
         });
+    }
+
+    @Override
+    public ItemStack getDefaultInstance() {
+        long millis = Util.getMillis();
+        List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
+        RANDOM.setSeed(millis);
+        return fromSourceStack(items.get(RANDOM.nextInt(items.size())).getDefaultInstance());
     }
 }
