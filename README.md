@@ -20,7 +20,7 @@
 ### Everything Compressor
 - Can compress any item into a Singularity.
 - Each Singularity requires 10,000 of the original item (configurable).
-- Singularities can be compressed again.
+- Singularities can be compressed too.
 ### Singularity Extractor
 - Can extract the original item from a Singularity.
 - A single Singularity produces one item every 30 seconds (configurable).
