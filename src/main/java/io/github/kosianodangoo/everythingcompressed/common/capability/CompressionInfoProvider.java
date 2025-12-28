@@ -1,15 +1,22 @@
 package io.github.kosianodangoo.everythingcompressed.common.capability;
 
+import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModCapabilities;
+import io.github.kosianodangoo.everythingcompressed.utils.CompressionInfoUtil;
+import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class CompressionInfoProvider implements ICapabilityProvider {
     private ItemStack stack;
@@ -20,7 +27,9 @@ public class CompressionInfoProvider implements ICapabilityProvider {
 
     public CompressionInfoProvider(ItemStack stack) {
         this.stack = stack;
-        this.compressionInfo = new CompressionInfo(ItemStack.EMPTY, 0, this::save);
+        ItemStack defaultSourceStack = CompressionInfoUtil.getDefaultSourceStack();
+        long defaultCompressionTime = EverythingCompressedConfig.RANDOMIZE_EMPTY_SINGULARITY.get() ? 1 : 0;
+        this.compressionInfo = new CompressionInfo(defaultSourceStack, defaultCompressionTime, this::save);
         load();
         lazyCompressionInfo = LazyOptional.of(() -> this.compressionInfo);
     }

@@ -1,6 +1,7 @@
 package io.github.kosianodangoo.everythingcompressed.common.item;
 
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
+import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.client.renderer.SingularityItemRenderer;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.capability.CompressionInfo;
@@ -25,6 +26,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +37,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class SingularityItem extends Item {
-    public static final RandomSource RANDOM = RandomSource.create();
     public SingularityItem(Properties p_41383_) {
         super(p_41383_);
     }
@@ -116,9 +117,9 @@ public class SingularityItem extends Item {
 
     @Override
     public ItemStack getDefaultInstance() {
-        long millis = Util.getMillis();
-        List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
-        RANDOM.setSeed(millis);
-        return fromSourceStack(items.get(RANDOM.nextInt(items.size())).getDefaultInstance());
+        if (EverythingCompressedConfig.RANDOMIZE_EMPTY_SINGULARITY.get()) {
+            return fromSourceStack(CompressionInfoUtil.getDefaultSourceStack());
+        }
+        return super.getDefaultInstance();
     }
 }
