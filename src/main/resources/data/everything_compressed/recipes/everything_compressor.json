@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "n": {
+      "item": "minecraft:netherite_block"
+    },
+    "d": {
+      "item": "minecraft:diamond_block"
+    },
+    "i": {
+      "item": "minecraft:iron_block"
+    },
+    "s": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "pattern": [
+    "nin",
+    "dsd",
+    "nin"
+  ],
+  "result": {
+    "item": "everything_compressed:everything_compressor"
+  },
+  "show_notification": true
+}

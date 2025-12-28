@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "n": {
+      "item": "minecraft:netherite_block"
+    },
+    "d": {
+      "item": "minecraft:diamond_block"
+    },
+    "i": {
+      "item": "minecraft:iron_block"
+    },
+    "s": {
+      "item": "everything_compressed:singularity"
+    }
+  },
+  "pattern": [
+    "nin",
+    "dsd",
+    "nin"
+  ],
+  "result": {
+    "item": "everything_compressed:singularity_extractor"
+  },
+  "show_notification": true
+}
