@@ -1,6 +1,7 @@
 package io.github.kosianodangoo.everythingcompressed.common.network;
 
 import io.github.kosianodangoo.everythingcompressed.common.network.clientbound.ClientboundUpdateCompressedStackPacket;
+import io.github.kosianodangoo.everythingcompressed.common.network.serverbound.ServerboundCompressorExportPacket;
 import io.github.kosianodangoo.everythingcompressed.common.network.serverbound.ServerboundUpdateCompressorLockStatePacket;
 import io.github.kosianodangoo.everythingcompressed.utils.ResourceLocationUtil;
 import net.minecraftforge.network.NetworkRegistry;
@@ -16,5 +17,6 @@ public class EverythingCompressedConnection {
 
         INSTANCE.registerMessage(++id, ClientboundUpdateCompressedStackPacket.class, ClientboundUpdateCompressedStackPacket::encode, ClientboundUpdateCompressedStackPacket::decode, ClientboundUpdateCompressedStackPacket::handle);
         INSTANCE.registerMessage(++id, ServerboundUpdateCompressorLockStatePacket.class, ServerboundUpdateCompressorLockStatePacket::encode, ServerboundUpdateCompressorLockStatePacket::decode, ServerboundUpdateCompressorLockStatePacket::handle);
+        INSTANCE.registerMessage(++id, ServerboundCompressorExportPacket.class, ServerboundCompressorExportPacket::encode, ServerboundCompressorExportPacket::decode, ServerboundCompressorExportPacket::handle);
     }
 }

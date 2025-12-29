@@ -117,6 +117,16 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
         }
     }
 
+    public void exportCompressedStack() {
+        if(this.product > 0) {
+            return;
+        }
+        this.setProductStack(this.getCompressedStack());
+        this.product = this.getProgress();
+        this.progress = 0;
+        this.setCompressedStack(ItemStack.EMPTY);
+    }
+
     public long getSingularityDensity() {
         return SINGULARITY_DENSITY.get();
     }
@@ -139,7 +149,7 @@ public class EverythingCompressorBlockEntity extends BlockEntity implements Menu
 
     public boolean isValidStack(ItemStack stack) {
         ICompressionInfo compressionInfo = CompressionInfoUtil.getCompressionInfo(stack);
-        return (getCompressedStack().isEmpty() && (compressionInfo == null || compressionInfo.getCompressionTime() < Long.MAX_VALUE)) || (getProgress() < Long.MAX_VALUE &&  ItemStack.isSameItemSameTags(getCompressedStack(), stack));
+        return (getProductStack().isEmpty() && getCompressedStack().isEmpty() && (compressionInfo == null || compressionInfo.getCompressionTime() < Long.MAX_VALUE)) || (getProgress() < Long.MAX_VALUE &&  ItemStack.isSameItemSameTags(getCompressedStack(), stack));
     }
 
     public long getProgress() {

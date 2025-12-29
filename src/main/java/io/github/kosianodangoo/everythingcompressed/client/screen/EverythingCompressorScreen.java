@@ -2,8 +2,10 @@ package io.github.kosianodangoo.everythingcompressed.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.kosianodangoo.everythingcompressed.EverythingCompressed;
+import io.github.kosianodangoo.everythingcompressed.client.screen.widget.IconButton;
 import io.github.kosianodangoo.everythingcompressed.common.menu.EverythingCompressorMenu;
 import io.github.kosianodangoo.everythingcompressed.common.network.EverythingCompressedConnection;
+import io.github.kosianodangoo.everythingcompressed.common.network.serverbound.ServerboundCompressorExportPacket;
 import io.github.kosianodangoo.everythingcompressed.common.network.serverbound.ServerboundUpdateCompressorLockStatePacket;
 import io.github.kosianodangoo.everythingcompressed.utils.ResourceLocationUtil;
 import io.netty.util.internal.MathUtil;
@@ -25,6 +27,7 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
     private static final ResourceLocation TEXTURE =
             ResourceLocationUtil.getResourceLocation("textures/gui/everything_compressor.png");
     private LockIconButton lockButton;
+    private IconButton exportButton;
 
     public EverythingCompressorScreen(EverythingCompressorMenu p_97741_, Inventory p_97742_, Component p_97743_) {
         super(p_97741_, p_97742_, p_97743_);
@@ -39,9 +42,12 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
         int y = (height - this.imageHeight) / 2;
 
         super.init();
-        addRenderableWidget(lockButton = new CompressorLockButton(x + 17, y + 57, (button -> {
+        addRenderableWidget(lockButton = new CompressorLockButton(x + 17, y + 56, (button -> {
             EverythingCompressedConnection.INSTANCE.sendToServer(new ServerboundUpdateCompressorLockStatePacket(!menu.isLocked(), this.menu.containerId));
         })));
+        addRenderableWidget(exportButton = new IconButton(x + 138, y + 56, 20, 20, (button) -> {
+            EverythingCompressedConnection.INSTANCE.sendToServer(new ServerboundCompressorExportPacket(this.menu.containerId));
+        }, TEXTURE, 176, 15));
     }
 
     @Override
@@ -71,6 +77,7 @@ public class EverythingCompressorScreen extends AbstractContainerScreen<Everythi
 
     @Override
     public void render(GuiGraphics graphics, int i, int i1, float v) {
+        exportButton.active = this.menu.getProduct() <= 0 && !this.menu.getCompressedStack().isEmpty() && this.menu.getProgress() > 0;
         this.renderBackground(graphics);
         super.render(graphics, i, i1, v);
         this.renderTooltip(graphics, i, i1);
