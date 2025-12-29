@@ -71,25 +71,6 @@ public class SingularityItem extends Item {
     }
 
     @Override
-    public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
-        super.readShareTag(stack, nbt);
-        if(nbt.contains(CompressionInfoProvider.COMPRESSION_INFO_NBT)) {
-            CompressionInfoUtil.getLazyCompressionInfo(stack).ifPresent((cap) ->
-                cap.deserializeNBT(nbt.getCompound(CompressionInfoProvider.COMPRESSION_INFO_NBT))
-            );
-        }
-    }
-
-    @Override
-    public @Nullable CompoundTag getShareTag(ItemStack stack) {
-        CompoundTag compoundTag = super.getShareTag(stack);
-        CompressionInfoUtil.getLazyCompressionInfo(stack).ifPresent((cap) ->
-            compoundTag.put(CompressionInfoProvider.COMPRESSION_INFO_NBT, cap.serializeNBT())
-        );
-        return compoundTag;
-    }
-
-    @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
         ItemStack sourceStack = ItemStack.EMPTY;
         long compressionTime = 0;
