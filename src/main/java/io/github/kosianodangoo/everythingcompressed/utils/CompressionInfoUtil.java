@@ -4,6 +4,7 @@ import io.github.kosianodangoo.everythingcompressed.EverythingCompressedConfig;
 import io.github.kosianodangoo.everythingcompressed.common.api.ICompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.capability.CompressionInfo;
 import io.github.kosianodangoo.everythingcompressed.common.init.ModCapabilities;
+import io.github.kosianodangoo.everythingcompressed.common.init.ModItems;
 import io.github.kosianodangoo.everythingcompressed.common.item.SingularityItem;
 import net.minecraft.Util;
 import net.minecraft.util.RandomSource;
@@ -48,7 +49,8 @@ public class CompressionInfoUtil {
             long millis = Util.getMillis();
             List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
             RANDOM.setSeed(millis / 200);
-            return items.get(RANDOM.nextInt(items.size())).getDefaultInstance();
+            Item result = items.get(RANDOM.nextInt(items.size()));
+            return result == ModItems.SINGULARITY.get() ? ItemStack.EMPTY : result.getDefaultInstance();
         } catch (Exception e) {
             return ItemStack.EMPTY;
         }
