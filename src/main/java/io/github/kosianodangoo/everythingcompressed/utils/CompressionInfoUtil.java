@@ -50,7 +50,7 @@ public class CompressionInfoUtil {
             List<Item> items = ForgeRegistries.ITEMS.getValues().stream().toList();
             RANDOM.setSeed(millis / 200);
             Item result = items.get(RANDOM.nextInt(items.size()));
-            return result == ModItems.SINGULARITY.get() ? ItemStack.EMPTY : result.getDefaultInstance();
+            return result.getDefaultInstance();
         } catch (Exception e) {
             return ItemStack.EMPTY;
         }

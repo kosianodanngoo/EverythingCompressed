@@ -114,12 +114,4 @@ public class SingularityItem extends Item {
             }
         });
     }
-
-    @Override
-    public ItemStack getDefaultInstance() {
-        if (EverythingCompressedConfig.RANDOMIZE_EMPTY_SINGULARITY.get()) {
-            return fromSourceStack(CompressionInfoUtil.getDefaultSourceStack());
-        }
-        return super.getDefaultInstance();
-    }
 }
