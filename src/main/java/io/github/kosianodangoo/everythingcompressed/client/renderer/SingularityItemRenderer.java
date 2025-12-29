@@ -55,7 +55,7 @@ public class SingularityItemRenderer extends BlockEntityWithoutLevelRenderer {
 
         ClientLevel level = Minecraft.getInstance().level;
         RandomSource random = level != null ? level.getRandom() : RANDOM;
-        double randomScaleMultiplier = 0.1;
+        double randomScaleMultiplier = 0.05;
         double randomScaling = (randomScaleMultiplier * random.nextGaussian()) + 1;
 
         double brightness = compressionInfo.getCompressionTime() != -1 ? (float) (1f / Math.sqrt(compressionInfo.getCompressionTime() + 1)) : 1;
